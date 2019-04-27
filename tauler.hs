@@ -1,9 +1,12 @@
 module Tauler (
  Tauler,
+ taulerBuit,
  taulerInicial,
+ pecesDeUnColor,
  pecaA,
  casellaBuida,
  eliminarPeca,
+ afegirPeca,
  modificarPosicioPeca,
  alguEntre
 ) where
@@ -33,6 +36,10 @@ instance Show Tauler where
     extremSuperiorIInferior ++
     "    abcdefgh\n"
 
+-- Inicialització d'un tauler buit
+taulerBuit :: Tauler
+taulerBuit = Tauler []
+
 -- Inicialització d'un tauler amb les peces a les posicions inicials
 taulerInicial :: Tauler
 taulerInicial = Tauler
@@ -40,6 +47,10 @@ taulerInicial = Tauler
   [Peca Negre P (7,x)|x<-[1..8]] ++
   zipWith (Peca Blanc) (map (\l->read[l]) "TCADRACT") [(1,i)|i<-[1..8]] ++
   zipWith (Peca Negre) (map (\l->read[l]) "TCADRACT") [(8,i)|i<-[1..8]])
+
+-- Funció que donat un tauler i un color retorna una llista amb totes les peces d'aquell color
+pecesDeUnColor :: Tauler -> Color -> [Peca]
+pecesDeUnColor (Tauler llistaPeces) color = filter (\x@(Peca c t pos) -> c == color) llistaPeces
 
 -- Funció que ens retorna la peça que ocupa una posició en un tauler
 -- En cas de que aquesta estigui buida retorna una peça especial Buida
