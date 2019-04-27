@@ -4,6 +4,7 @@ module Partida(
  canviJugador
 ) where
 
+import Peca
 import Tauler
 import Color
 

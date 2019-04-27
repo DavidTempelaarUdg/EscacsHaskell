@@ -19,10 +19,9 @@ instance Show TipusDePeca where
  show T = "t"
  show D = "d"
  show R = "r"
-
-
+ 
 -- Definim la peça
-data Peca = Peca { color :: Color, tipus :: TipusDePeca, pos :: Posicio } | Buida deriving (Eq)
+data Peca = Peca Color TipusDePeca Posicio | Buida deriving (Eq)
 
 --  Override del show per modificar com es mostra, blanques en majúscules, negres en minúscules
 instance Show Peca where

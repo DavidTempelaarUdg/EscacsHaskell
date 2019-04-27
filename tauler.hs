@@ -3,8 +3,9 @@ module Tauler (
  taulerInicial,
  pecaA,
  casellaBuida,
- fesJugada,
- jugadaLegal
+ eliminarPeca,
+ modificarPosicioPeca,
+ alguEntre
 ) where
 
 import Data.Char
@@ -12,7 +13,6 @@ import Data.Char
 import Posicio
 import Color
 import Peca
-import Jugada
 
 -- Definim el tauler d'escacs, és una llista de peçes
 data Tauler = Tauler [Peca]
@@ -46,30 +46,34 @@ taulerInicial = Tauler
 pecaA :: Tauler -> Posicio -> Peca
 pecaA (Tauler llistaPeces) pos 
  | valida pos = trobarPeca llistaPeces pos
- | otherwise = error "posició invàlida"
+ | otherwise = error "Has intentat buscar una peça en una posició que no és vàlida"
  where
   trobarPeca (x@(Peca c t pos):xs) p
    | pos == p = x
    | otherwise = trobarPeca xs p
   trobarPeca [] pos = Buida
- 
+
+-- Funció que rep un tauler i una posició i retorna el tauler sense la peça que ocupava aquella posició
+eliminarPeca :: Tauler -> Posicio -> Tauler
+eliminarPeca (Tauler llistaPeces) posD
+ | valida posD = Tauler (filter (\x@(Peca c t pos) -> pos /= posD) llistaPeces)
+ | otherwise = error "Has intentat eliminar una peça d'una posició que no és correcte"
+
+-- Funció que rep un tauler i una peça i retorna un tauler amb la peça afegida en aquesta
+afegirPeca :: Tauler -> Peca -> Tauler
+afegirPeca (Tauler llistaPeces) peca = Tauler (llistaPeces ++ [peca])
+
+-- Funció que rep un tauler, una peça i una posició destí i retorna un tauler amb la peça moguda a destí
+modificarPosicioPeca :: Tauler -> Peca -> Posicio -> Tauler
+modificarPosicioPeca tauler@(Tauler llistaPeces)  peca@(Peca c t pos) posD 
+ | valida posD && peca == pecaA tauler pos = afegirPeca (eliminarPeca tauler pos) (Peca c t posD)
+ | otherwise = error "Has intentat moure una peça a una posició que no existeix o la peça que vols moure no ocupa aquella posició"
+
 -- Funció que ens retorna cert si la casella està buida en un tauler i una posició, fals altrament
 casellaBuida :: Tauler -> Posicio -> Bool
 casellaBuida tauler pos = pecaA tauler pos == Buida
 
--- Funció que rep un tauler, una posició origen i una posició destí i retorna un tauler si la Jugada és legal
--- altrament llença una excepció
-fesJugada :: Tauler -> Jugada -> Tauler
-fesJugada tauler mov@(Jugada peca posDesti)
- | jugadaLegal tauler mov = iMoure tauler peca posDesti
- | otherwise = error"Jugada il·legal"
- where
-  eliminarPeca llistaPeces posD = filter (\x@(Peca c t pos) -> pos /= posD) llistaPeces
-  modificarPosicioPeca llistaPeces posD peca@(Peca c t pos) = Tauler ((eliminarPeca llistaPeces pos) ++ [(Peca c t posD)])
-  iMoure tauler@(Tauler llistaPeces) peca@(Peca color tipus posOrigen) posDesti
-   | pecaA tauler posDesti /= Buida = modificarPosicioPeca (eliminarPeca llistaPeces posDesti) posDesti peca
-   | otherwise = modificarPosicioPeca llistaPeces posDesti peca
-   
--- Funció que ens diu si una jugada és legal en un taler. Retorna cert si ho és, fals altrament
-jugadaLegal :: Tauler -> Jugada -> Bool
-jugadaLegal t mov = True
+-- Funció que rep un tauler i dos posicions i retorna cert si hi ha peces entre les dos posicions o fals altrament
+alguEntre :: Tauler -> Posicio -> Posicio -> Bool
+alguEntre tauler posOrigen posDesti = False
+
