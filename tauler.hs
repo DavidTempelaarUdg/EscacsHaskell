@@ -25,7 +25,7 @@ instance Show Tauler where
    mostrarPecaA tauler f c = show (pecaA tauler (f,c))
    mostrarFila tauler f =
     show f ++ "- |" ++
-    concat [mostrarPecaA tauler x f|x<-[1..8]] ++
+    concat [mostrarPecaA tauler f x|x<-[1..8]] ++
     "|\n"
    iMostrarTauler tauler =
     extremSuperiorIInferior ++
@@ -36,10 +36,10 @@ instance Show Tauler where
 -- Inicialització d'un tauler amb les peces a les posicions inicials
 taulerInicial :: Tauler
 taulerInicial = Tauler
-  ([Peca Blanc P (x,2)|x<-[1..8]] ++
-  [Peca Negre P (x,7)|x<-[1..8]] ++
-  zipWith (Peca Blanc) (map (\l->read[l]) "TCADRACT") [(i,1)|i<-[1..8]] ++
-  zipWith (Peca Negre) (map (\l->read[l]) "TCADRACT") [(i,8)|i<-[1..8]])
+  ([Peca Blanc P (2,x)|x<-[1..8]] ++
+  [Peca Negre P (7,x)|x<-[1..8]] ++
+  zipWith (Peca Blanc) (map (\l->read[l]) "TCADRACT") [(1,i)|i<-[1..8]] ++
+  zipWith (Peca Negre) (map (\l->read[l]) "TCADRACT") [(8,i)|i<-[1..8]])
 
 -- Funció que ens retorna la peça que ocupa una posició en un tauler
 -- En cas de que aquesta estigui buida retorna una peça especial Buida
@@ -74,6 +74,26 @@ casellaBuida :: Tauler -> Posicio -> Bool
 casellaBuida tauler pos = pecaA tauler pos == Buida
 
 -- Funció que rep un tauler i dos posicions i retorna cert si hi ha peces entre les dos posicions o fals altrament
+-- S'ha de fer servir pels moviments de torre, alfil i dama
 alguEntre :: Tauler -> Posicio -> Posicio -> Bool
-alguEntre tauler posOrigen posDesti = False
-
+alguEntre tauler posOrigen@(x_ori, y_ori) posDesti@(x_des, y_des)
+ | x_ori - x_des == 0 = alguEntreVertical tauler posOrigen y_des
+ | y_ori - y_des == 0 = alguEntreHoritzontal tauler posOrigen x_des
+ | abs(x_ori - x_des) == abs(y_ori - y_des) = alguEntreDiagonal tauler posOrigen posDesti
+ | otherwise = error "tipus de moviment no vàlid"
+ where
+  alguEntreVertical tauler posOri@(x,y_inicial) y_final
+   | y_inicial<=y_final = any (/=True) [casellaBuida tauler (x,y) | y <- [(y_inicial+1)..(y_final-1)]]
+   | otherwise = any (/=True) [casellaBuida tauler (x,y) | y <- [(y_final+1)..(y_inicial-1)]]
+  alguEntreHoritzontal tauler posOri@(x_inicial,y) x_final
+   | x_inicial<=x_final = any (/=True) [casellaBuida tauler (x,y) | x <- [(x_inicial+1)..(x_final-1)]]
+   | otherwise = any (/=True) [casellaBuida tauler (x,y) | x <- [(x_final+1)..(x_inicial-1)]]
+  alguEntreDiagonal tauler posOri@(x_inicial,y_inicial) posDesti@(x_final,y_final)
+   -- Les dos creixen
+   | x_inicial<=x_final && y_inicial<=y_final = any (/=True) [casellaBuida tauler (x_inicial+x,y_inicial+x) | x <- [1..(x_final-x_inicial)]]
+   -- Les dos disminueixen
+   | x_inicial>x_final && y_inicial>y_final = any (/=True) [casellaBuida tauler (x_inicial-x,y_inicial-x) | x <- [1..(x_inicial-x_final)]]
+   -- Creix x, però no y
+   | x_inicial<=x_final && y_inicial>y_final = any (/=True) [casellaBuida tauler (x_inicial+x,y_inicial-x) | x <- [1..(x_final-x_inicial)]]
+   -- No creix x, però sí y
+   | otherwise = any (/=True) [casellaBuida tauler (x_inicial-x,y_inicial+x) | x <- [1..(x_inicial-x_final)]]

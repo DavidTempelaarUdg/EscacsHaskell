@@ -4,9 +4,9 @@ module Partida(
  canviJugador
 ) where
 
+import Color
 import Peca
 import Tauler
-import Color
 
 -- Definim la partida, és un tauler i qui juga
 -- L'estat inicial de la partida, sempre comencen blanques

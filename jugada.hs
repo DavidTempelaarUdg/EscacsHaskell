@@ -19,9 +19,9 @@ fesJugada tauler mov@(Jugada peca posDesti)
  | jugadaLegal tauler mov = iMoure tauler peca posDesti
  | otherwise = error"Jugada il·legal"
  where
-  iMoure tauler@(Tauler llistaPeces) peca@(Peca color tipus posOrigen) posDesti
-   | pecaA tauler posDesti /= Buida = modificarPosicioPeca (eliminarPeca llistaPeces posDesti) posDesti peca
-   | otherwise = modificarPosicioPeca llistaPeces posDesti peca
+  iMoure tauler peca@(Peca color tipus posOrigen) posDesti
+   | pecaA tauler posDesti /= Buida = modificarPosicioPeca (eliminarPeca tauler posDesti) peca posDesti
+   | otherwise = modificarPosicioPeca tauler peca posDesti
    
 -- Funció que ens diu si una jugada és legal en un taler. Retorna cert si ho és, fals altrament
 jugadaLegal :: Tauler -> Jugada -> Bool
