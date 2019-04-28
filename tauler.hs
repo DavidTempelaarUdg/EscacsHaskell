@@ -4,6 +4,7 @@ module Tauler (
  taulerInicial,
  pecesDeUnColor,
  pecaA,
+ posicioRey,
  casellaBuida,
  eliminarPeca,
  afegirPeca,
@@ -57,12 +58,20 @@ pecesDeUnColor (Tauler llistaPeces) color = filter (\x@(Peca c t pos) -> c == co
 pecaA :: Tauler -> Posicio -> Peca
 pecaA (Tauler llistaPeces) pos 
  | valida pos = trobarPeca llistaPeces pos
- | otherwise = error "Has intentat buscar una peça en una posició que no és vàlida"
+ | otherwise = Buida
  where
   trobarPeca (x@(Peca c t pos):xs) p
    | pos == p = x
    | otherwise = trobarPeca xs p
   trobarPeca [] pos = Buida
+  
+-- Funció que rep un tauler i un color i ens diu la posició en la que es troba aquell rei
+posicioRey :: Tauler -> Color -> Posicio
+posicioRey (Tauler llistaPeces) color = iPosicioRey llistaPeces color
+ where 
+  iPosicioRey (x@(Peca c t pos):xs) color
+   | t== R && c == color = pos
+   | otherwise = iPosicioRey xs color
 
 -- Funció que rep un tauler i una posició i retorna el tauler sense la peça que ocupava aquella posició
 eliminarPeca :: Tauler -> Posicio -> Tauler
