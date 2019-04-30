@@ -17,3 +17,4 @@ iniciPartida = (taulerInicial, Blanc)
 
 canviJugador :: Partida -> Partida
 canviJugador (t, c) = (t, contrari c)
+
