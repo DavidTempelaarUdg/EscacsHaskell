@@ -11,18 +11,15 @@ import System.IO (hFlush, stdout)
 
 
 
-
 main = do
   let partida = iniciPartida
   content <- readFile "pastor.txt"
   let ls = words content
   mostrarTauler partida
+  mapM_ putStrLn ls
   mostrarEntrada partida ls
-  --let partida = ferJugades partida ls
+  let partida = ferJugades partida ls
   mostrarTauler partida
-
-
-
 
 
 
@@ -34,9 +31,12 @@ mostrarEntrada part@(Partida t c) [] = print "mostrarEntrada: sha entrat a llist
 mostrarEntrada part@(Partida t c) [x,y]  --mirar si certament el primer és escac mat
   | y!!5=='+' && y!!6=='+' && escacIMat t c = print "mostrarEntrada: sha entrat com a escac mat"
   | otherwise = print "mostrarEntrada: s'ha entrar com a no Escac mat"
+mostrarEntrada part@(Partida t c) [x,y,z]  --mirar si certament el segon és escac mat
+  | z!!5=='+' && z!!6=='+' && escacIMat t (contrari c) = print "mostrarEntrada: sha entrat com a escac mat contrincant"
+  | otherwise = print "mostrarEntrada: s'ha entrar com a no Escac mat contrincant"
 mostrarEntrada part@(Partida t c) (x:y:z:xs)
   | not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0)) = print "mostrarEntrada: sha entrat a llista plena, not number"
-  | y!!5=='+' && y!!6=='+' && escacIMat t c = print "mostrarEntrada: sha entrat a llista plena, escacmat"
+  | (any ('+'==) y) && y!!5=='+' && escac t c = print "mostrarEntrada: sha entrat a llista plena, escacmat"
   | otherwise = print "mostrarEntrada: sha entrat a llista plena, otherwise"
 
 
@@ -48,6 +48,20 @@ ferJugades part@(Partida t c) [] = part
 ferJugades part@(Partida t c) [x,y]  --mirar si certament el primer és escac mat, unica possibilitat
   | y!!5=='+' && y!!6=='+' && escacIMat t c = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
   | otherwise = error "tipus de moviment no vàlid, escac mat no existeix"
+ferJugades part@(Partida t c) [x,y,z]  --mirar si certament el segon és escac mat, unica possibilitat
+  | z!!5=='+' && z!!6=='+' && (escacIMat t (contrari c)) = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
+  | otherwise = error "tipus de moviment no vàlid, escac mat no existeix"
+ferJugades part@(Partida t c) (x:y:z:xs) =  ferJugades (iferJugada (iferJugada part y) z) xs
+ where
+  iferJugada (partida@(Partida t c)) str
+    | not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0)) = error "El fitxer conté una jugada mal entrada"
+    | (any ('+'==) y) && y!!5=='+' && escac t c = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
+    | otherwise = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
+ 
+
+
+
+{- 
 ferJugades part@(Partida t c) [x,y,z]  --mirar si certament el primer és escac (a seques)
   | y!!5=='+' && escac t c = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
   | otherwise = error "tipus de moviment no vàlid, escac no existeix"
@@ -57,7 +71,7 @@ ferJugades part@(Partida t c) (x:y:z:xs) =  ferJugades (iferJugada (iferJugada p
     | not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0)) = error "El fitxer conté una jugada mal entrada"
     | y!!5=='+' && y!!6=='+' && escacIMat t c = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
     | otherwise = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
-
+ -}
 
 {- 
 | not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0))  = error "El fitxer conté una jugada mal entrada"
