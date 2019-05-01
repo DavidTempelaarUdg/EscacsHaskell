@@ -14,12 +14,11 @@ import System.IO (hFlush, stdout)
 
 main = do
   let partida = iniciPartida
-  content <- readFile "prova.txt"
+  content <- readFile "pastor.txt"
   let ls = words content
-  mapM_ putStrLn ls
   mostrarTauler partida
   mostrarEntrada partida ls
-  let partida = ferJugades partida ls
+  --let partida = ferJugades partida ls
   mostrarTauler partida
 
 
@@ -35,58 +34,51 @@ mostrarEntrada part@(Partida t c) [] = print "mostrarEntrada: sha entrat a llist
 mostrarEntrada part@(Partida t c) [x,y]  --mirar si certament el primer és escac mat
   | y!!5=='+' && y!!6=='+' && escacIMat t c = print "mostrarEntrada: sha entrat com a escac mat"
   | otherwise = print "mostrarEntrada: s'ha entrar com a no Escac mat"
-mostrarEntrada part@(Partida t c) (x:y:z:xs) = print "mostrarEntrada: te mes de dos entrades a string"
+mostrarEntrada part@(Partida t c) (x:y:z:xs)
+  | not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0)) = print "mostrarEntrada: sha entrat a llista plena, not number"
+  | y!!5=='+' && y!!6=='+' && escacIMat t c = print "mostrarEntrada: sha entrat a llista plena, escacmat"
+  | otherwise = print "mostrarEntrada: sha entrat a llista plena, otherwise"
+
 
 castingChar :: String -> Char
 castingChar s = s!!0
 
 ferJugades :: Partida -> [String] -> Partida
 ferJugades part@(Partida t c) [] = part
-ferJugades part@(Partida t c) [x,y]  --mirar si certament el primer és escac mat
+ferJugades part@(Partida t c) [x,y]  --mirar si certament el primer és escac mat, unica possibilitat
   | y!!5=='+' && y!!6=='+' && escacIMat t c = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
-  | otherwise = error "tipus de moviment no vàlid, escac mat on no existeix"
-ferJugades part@(Partida t c) (x:y:z:xs) = part
-
-
-
+  | otherwise = error "tipus de moviment no vàlid, escac mat no existeix"
+ferJugades part@(Partida t c) [x,y,z]  --mirar si certament el primer és escac (a seques)
+  | y!!5=='+' && escac t c = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
+  | otherwise = error "tipus de moviment no vàlid, escac no existeix"
+ferJugades part@(Partida t c) (x:y:z:xs) =  ferJugades (iferJugada (iferJugada part y) z) xs
+ where
+  iferJugada (partida@(Partida t c)) str
+    | not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0)) = error "El fitxer conté una jugada mal entrada"
+    | y!!5=='+' && y!!6=='+' && escacIMat t c = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
+    | otherwise = Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c)
 
 
 {- 
-  fesJugada :: Tauler -> Jugada -> Tauler
-  Jugada Peca Posicio
-  Peca Color TipusDePeca Posicio
-  Posicio = (Integer, Integer)
-
-  fesJugada t (Jugada (Peca c (read y!!0) ((taulerCharToInteger y!!1),())) (posDesti))
+| not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0))  = error "El fitxer conté una jugada mal entrada"
+  | otherwise = error "El fitxer conté una jugada mal entrada" -}
 
 
 
 
 
 
-
-
-  
-ferJugades part@(Partida t c) (x:y:z:xs) = part -}
-
---quan en un cicle hi ha escac mat i no juga laltre jugador
-
-{- ferJugades partida (x:y:z:xs) = execJugada . mostrarTauler partida . ferJugades
+{- ferJugades partida (x:y:z:xs) = execJugadaPrimer . execJugadaSegona . mostrarTaulerJugada . ferJugadesSeguent(bucle)
   where execJugada 
-    |    -- = error "El fitxer conté una jugada mal entrada"  --mal entrat
+    |    
+
     |    -- si jaque inexistent
+    |    -- si jaque mate inexistent
+
     |    -- si jaque existent
-    |    -- si jaque mate inexistent 
     |    -- si jaque mate existent
+
     |    -- ??algun altre
     |    -- aplicar jugada normal (error es mostra en la propia jugada)
  -}
-{- fesJugada :: Tauler -> Jugada -> Tauler
-fesJugada tauler mov@(Jugada peca@(Peca c t pos) posDesti)
- | peca == (pecaA tauler pos) && jugadaLegal tauler mov = iMoure tauler peca posDesti
- | otherwise = error"Jugada il·legal"
- where
-  iMoure tauler peca@(Peca color tipus posOrigen) posDesti
-   | pecaA tauler posDesti /= Buida = modificarPosicioPeca (eliminarPeca tauler posDesti) peca posDesti
-   | otherwise = modificarPosicioPeca tauler peca posDesti -}
    
