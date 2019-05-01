@@ -18,8 +18,8 @@ main = do
   mostrarTauler partida
   mapM_ putStrLn ls
   mostrarEntrada partida ls
-  let partida = ferJugades partida ls
-  mostrarTauler partida
+  let partidaI = ferJugades partida ls
+  mostrarTauler partidaI
 
 
 
@@ -36,7 +36,7 @@ mostrarEntrada part@(Partida t c) [x,y,z]  --mirar si certament el segon és esc
   | otherwise = print "mostrarEntrada: s'ha entrar com a no Escac mat contrincant"
 mostrarEntrada part@(Partida t c) (x:y:z:xs)
   | not (isNumber (x!!0) && isLetter (y!!0) && isLetter (z!!0)) = print "mostrarEntrada: sha entrat a llista plena, not number"
-  | (any ('+'==) y) && y!!5=='+' && escac t c = print "mostrarEntrada: sha entrat a llista plena, escacmat"
+  | (any ('+'==) y) && y!!5=='+' && escac t c = print "mostrarEntrada: sha entrat a llista plena, escac mat"
   | otherwise = print "mostrarEntrada: sha entrat a llista plena, otherwise"
 
 
