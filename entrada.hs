@@ -16,6 +16,7 @@ main = do
   content <- readFile "pastor_copia.txt"
   let ls = words content
   mostrarTauler partida
+  mostrarEntrada partida ls
 
   let loop = do
       let partidaI = ferJugades partida ls
@@ -24,6 +25,8 @@ main = do
       mostrarTauler partida
 
       let ls = snd partidaI
+
+      mostrarEntrada partida ls
 
       let seguir = quedenParaules ls
       when (seguir /= 'n') loop
@@ -42,11 +45,17 @@ quedenParaules x = 'y'
 
 ferJugades :: Partida -> [String] -> (Partida,[String])
 ferJugades part@(Partida t c) [] = (part,[])
-ferJugades part@(Partida t c) [x,y] = (Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((taulerCharToInteger (y!!1)),(toInteger(digitToInt (y!!2))))) (((taulerCharToInteger (y!!3)),(toInteger(digitToInt (y!!4))))))) (contrari c),[])
-ferJugades part@(Partida t c) (x:y:z:xs) = (Partida (fesJugada (preJugada part y) (Jugada (Peca (contrari c) (((\l->read[l]) (z!!0))) ((taulerCharToInteger (z!!1)),(toInteger(digitToInt (z!!2))))) (((taulerCharToInteger (z!!3)),(toInteger(digitToInt (z!!4))))))) c,xs)
+ferJugades part@(Partida t c) [x,y] = ((Partida (fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((toInteger(digitToInt (y!!2))),(taulerCharToInteger (y!!1)))) (((toInteger(digitToInt (y!!4))),(taulerCharToInteger (y!!3)))))) (contrari c)),[])
+ferJugades part@(Partida t c) (x:y:z:xs) = ((Partida (fesJugada (fesJugada (jugAnterior part y) (Jugada (Peca c (((\l->read[l]) (y!!0))) ((toInteger(digitToInt (y!!2))),(taulerCharToInteger (y!!1)))) (((toInteger(digitToInt (y!!4))),(taulerCharToInteger (y!!3)))))) (Jugada (Peca (contrari c) (((\l->read[l]) (y!!0))) ((toInteger(digitToInt (y!!2))),(taulerCharToInteger (y!!1)))) (((toInteger(digitToInt (y!!4))),(taulerCharToInteger (y!!3)))))) c),xs)
  where
-  preJugada (partida@(Partida t c)) str =  fesJugada t (Jugada (Peca c (((\l->read[l]) (str!!0))) ((taulerCharToInteger (str!!1)),(toInteger(digitToInt (str!!2))))) (((taulerCharToInteger (str!!3)),(toInteger(digitToInt (str!!4))))))
+  jugAnterior (partida@(Partida t c)) str = fesJugada t (Jugada (Peca c (((\l->read[l]) (y!!0))) ((toInteger(digitToInt (y!!2))),(taulerCharToInteger (y!!1)))) (((toInteger(digitToInt (y!!4))),(taulerCharToInteger (y!!3))))) 
 
+
+mostrarEntrada :: Partida -> [String] -> IO()
+mostrarEntrada part@(Partida t c) [] = print "mostrarEntrada: sha entrat a llista buida"
+mostrarEntrada part@(Partida t c) [x,y] = print "mostrarEntrada: s'ha entrat llista 2"
+mostrarEntrada part@(Partida t c) [x,y,z] = print "mostrarEntrada: s'ha entrat llista 3"
+mostrarEntrada part@(Partida t c) (x:y:z:xs) = print "mostrarEntrada: sha entrat a llista plena, otherwise"
 
 
 {- ferJugades part@(Partida t c) [] = (part,[])
