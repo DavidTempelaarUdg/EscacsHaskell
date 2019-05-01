@@ -1,5 +1,5 @@
-module Partida(
- Partida,
+module Partida (
+ Partida(..),
  iniciPartida,
  canviJugador
 ) where

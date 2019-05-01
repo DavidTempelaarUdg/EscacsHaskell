@@ -31,16 +31,6 @@ instance Show Peca where
  show (Peca Blanc t pos) = map toUpper $ show t
  show (Peca Negre t pos) = show t
 
-llegirTipus :: Char -> TipusDePeca
-llegirTipus c
-  | c == 'p' = P
-  | c == 'c' = C
-  | c == 'a' = A
-  | c == 't' = T
-  | c == 'd' = D
-  | c == 'r' = R
-
-
 -- Funció que rep una peça i retorna cert si es troba a la posició inicial, fals altrament
 posicioInicial :: Peca -> Bool
 posicioInicial (Peca Blanc P (x,y)) = x == 2

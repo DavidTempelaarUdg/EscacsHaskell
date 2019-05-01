@@ -1,5 +1,5 @@
 module Tauler (
- Tauler,
+ Tauler(..),
  taulerBuit,
  taulerInicial,
  pecesDeUnColor,
